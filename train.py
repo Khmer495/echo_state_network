@@ -16,16 +16,16 @@ import pickle
 import sys
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--in_size','-i',type=int,help='input size(default=1)',default=1)
-    parser.add_argument('--res_size','-r',type=int,help='reservoir size(default=100)',default=100)
-    parser.add_argument('--out_size','-o',type=int,help='output size(default=1)',default=1)
-    parser.add_argument('--con','-c',type=float,help='connectivity range:0~1(default=0.05)',default=0.05)
-    parser.add_argument('--make',type=int,help='random weight make Yes:-1(default),No:0',default=-1)
-    parser.add_argument('--dataset','-d',type=str,help='dataset name MG:Mackey_Glass(default)' ,default='MG')
-    parser.add_argument('--data_len','-l',type=int,help='dataset length(default=2000)',default=2000)
-    parser.add_argument('--folder','-f',type=str,help='output folder name(default=nowtime)',default=datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
-    parser.add_argument('--topology','-t',type=str,help='topology:array (default:array)',default='random')
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--in_size', '-i', type=int, help='input size', default=1)
+    parser.add_argument('--res_size', '-r', type=int, help='reservoir size', default=100)
+    parser.add_argument('--out_size', '-o', type=int, help='output size', default=1)
+    parser.add_argument('--con', '-c', type=float, help='connectivity range:0~1', default=0.05)
+    #parser.add_argument('--make', type=int, help='random weight make Yes:-1(default), No:0', default=-1)
+    parser.add_argument('--dataset', '-d', type=str, help='dataset name' , default='MG', choices=['MG'])
+    parser.add_argument('--data_len', '-l', type=int, help='dataset length', default=2000)
+    parser.add_argument('--folder', '-f', type=str, help='output folder name (default: nowtime)', default=datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    parser.add_argument('--topology', '-t', type=str, help='select topology', default='random', choices=['random', 'ring', 'center', 'ring_center'])
 
     #for chainer
     parser.add_argument('--epoch', '-e', type=int, default=100,
@@ -65,12 +65,7 @@ def main():
 
 # set_reservoir
     print('set reservoir')
-    if args.topology == 'random':
-        rsv = reservoir.Random(args.folder,args.in_size,args.res_size,args.con)
-    else:
-        print('no topology')
-        sys.exit()
-
+    rsv = reservoir.Reservoir(args.folder,args.in_size,args.res_size,args.con,args.topology)
 
 # run_train_reservoir
     print('make x_train')

@@ -6,8 +6,8 @@ import numpy.random as rd
 import pandas as pd
 import pickle
 
-class Random():
-    def __init__(self, output_folder, K, N, C):
+class Reservoir():
+    def __init__(self, output_folder, K, N, C, topology):
         self.folder = output_folder
         self.K = K
         self.N = N
@@ -15,8 +15,26 @@ class Random():
         self.W_in = rd.normal(0,1,[K,1])
         W = rd.normal(0,1,[N,N])
         original_W = W
-        mask = np.random.choice([0,1],size=[N,N],p=[1-self.C,self.C]).astype(np.float32)
-        W = np.multiply(W,mask)
+        if topology == 'random':
+            mask = np.random.choice([0,1],size=[N,N],p=[1-self.C,self.C]).astype(np.float32)
+            W = np.multiply(W,mask)
+        elif topology == 'ring':
+            mask = np.eye(N)
+            W = np.multiply(W,mask)
+            W = np.roll(W,1,axis=1)
+        elif topology == 'center':
+            mask = np.zeros([N,N])
+            mask[N-1,:]=1
+            mask[:,N-1]=1
+            mask[N-1,N-1]=0
+            W = np.multiply(W,mask)
+        elif topology == 'ring_center':
+            mask = np.eye(N-1)
+            mask = np.roll(mask,1,axis=1)
+            mask = np.insert(mask,N-1,1,axis=0)
+            mask = np.insert(mask,N-1,1,axis=1)
+            mask[-1,-1]=0
+            W = np.multiply(W,mask)
         eigs_W, _ = la.eig(W)
         sr_W = np.max(abs(eigs_W))
         self.W = W / sr_W
